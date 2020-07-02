@@ -147,17 +147,29 @@ bigram_tf_idf_transformer = load('data_preprocessors/bigram_tf_idf_transformer.j
 
 X_train_bigram_tf_idf = load_npz('vectorized_data/X_train_bigram_tf_idf.npz')
 
+#Test unigram counts
+#X_test_unigram = unigram_vectorizer.transform(imdb_test['text'].values)
+
+#save_npz('vectorized_data/X_test_unigram.npz', X_test_unigram)
+
+X_test_unigram = load_npz('vectorized_data/X_test_unigram.npz')
+
+#Test bigram counts
+#X_test_bigram = bigram_vectorizer.transform(imdb_test['text'].values)
+
+#save_npz('vectorized_data/X_test_bigram.npz', X_test_bigram)
+
+X_test_bigram = load_npz('vectorized_data/X_test_bigram.npz')
+
 # Test bigram tf_idf
-#X_test_bigram_tf_idf = bigram_vectorizer.transform(imdb_test['text'].values)
-#X_test_bigram_tf_idf = bigram_tf_idf_transformer.transform(X_test_bigram_tf_idf)
+#X_test_bigram_tf_idf = bigram_tf_idf_transformer.transform(X_test_bigram)
 
 #save_npz('vectorized_data/X_test_bigram_tf_idf.npz', X_test_bigram_tf_idf)
 
 X_test_bigram_tf_idf = load_npz('vectorized_data/X_test_bigram_tf_idf.npz')
 
 #Test unigram tf_idf
-#X_test_unigram_tf_idf = unigram_vectorizer.transform(imdb_test['text'].values)
-#X_test_unigram_tf_idf = unigram_tf_idf_transformer.transform(X_test_unigram_tf_idf)
+#X_test_unigram_tf_idf = unigram_tf_idf_transformer.transform(X_test_unigram)
 
 #save_npz('vectorized_data/X_test_unigram_tf_idf.npz', X_test_unigram_tf_idf)
 
@@ -185,7 +197,7 @@ def train_and_show_scores_SGDC(X: csr_matrix, y: np.array, title: str) -> None:
 #train_and_show_scores_SGDC(X_train_bigram_tf_idf, y_train, 'Bigram Tf-Idf')
 
 #HYPERTUNING THE MODEL
-
+#Our model works the best on bigram tf-idf thats why we will use it for hypertuning
 X_train_SGDC = X_train_bigram_tf_idf
 
 
@@ -229,13 +241,12 @@ random_search_cv.fit(X_train_SGDC, y_train)
 #sgd_classifier = random_search_cv.best_estimator_
 #dump(sgd_classifier, 'classifiers/sgd_classifier.joblib')
 
+#TESTING THE MODEL
+'''
 sgd_classifier = load('classifiers/sgd_classifier.joblib')
 
-
-#TESTING THE MODEL
-
 score = sgd_classifier.score(X_test_bigram_tf_idf, y_test)
-print(score)
+print(f'Score of SGDC linear classifier with hyperparameter: {round(score, 2)}')
 '''
 #RANDOM FOREST
 def train_and_show_scores_random_forest(X: csr_matrix, y: np.array, title: str) -> None:
@@ -249,11 +260,11 @@ def train_and_show_scores_random_forest(X: csr_matrix, y: np.array, title: str) 
     valid_score = clf.score(X_valid, y_valid)
     print(f'{title}\nTrain score: {round(train_score, 2)} ; Validation score: {round(valid_score, 2)}\n')
 
-train_and_show_scores_random_forest(X_train_unigram, y_train, 'Unigram Counts')
-train_and_show_scores_random_forest(X_train_unigram_tf_idf, y_train, 'Unigram Tf-Idf')
-train_and_show_scores_random_forest(X_train_bigram, y_train, 'Bigram Counts')
-train_and_show_scores_random_forest(X_train_bigram_tf_idf, y_train, 'Bigram Tf-Idf')
-'''
+#train_and_show_scores_random_forest(X_train_unigram, y_train, 'Unigram Counts')
+#train_and_show_scores_random_forest(X_train_unigram_tf_idf, y_train, 'Unigram Tf-Idf')
+#train_and_show_scores_random_forest(X_train_bigram, y_train, 'Bigram Counts')
+#train_and_show_scores_random_forest(X_train_bigram_tf_idf, y_train, 'Bigram Tf-Idf')
+
 #clf_random_forest_without_hyper_parameter = RandomForestClassifier()
 #clf_random_forest_without_hyper_parameter.fit(X_train_unigram_tf_idf,y_train)
 
@@ -284,8 +295,8 @@ random_grid = {'n_estimators': n_estimators,
                'min_samples_split': min_samples_split,
                'min_samples_leaf': min_samples_leaf,
                'bootstrap': bootstrap}
-
-X_train_random_forest = X_train_unigram_tf_idf
+#Our model works the best on unigram thats why we will use it for hypertuning
+X_train_random_forest = X_train_unigram
 
 #clf = RandomForestClassifier()
 #clf_random = RandomizedSearchCV(estimator=clf, param_distributions = random_grid, n_iter = 10, cv = 3, verbose=2, random_state=42, n_jobs = -1)
@@ -296,11 +307,11 @@ X_train_random_forest = X_train_unigram_tf_idf
 #clf_random_forest = clf_random.best_estimator_
 #dump(clf_random.best_estimator_, 'classifiers/random_forest_classifier.joblib')
 
+'''
+#Testing the model
 clf_random_forest = load('classifiers/random_forest_classifier.joblib')
-
-score = clf_random_forest.score(X_test_unigram_tf_idf,y_test)
-print(f'Score of Random Forest classifier with hyperparameter: {score}')
-
+score = clf_random_forest.score(X_test_unigram,y_test)
+print(f'Score of Random Forest classifier with hyperparameter: {round(score, 2)}')
 
 #MULTINOMIAL NAIVE BAYES
 def train_and_show_scores_naive_bayes(X: csr_matrix, y: np.array, title: str) -> None:
@@ -319,7 +330,14 @@ train_and_show_scores_naive_bayes(X_train_unigram_tf_idf, y_train, 'Unigram Tf-I
 train_and_show_scores_naive_bayes(X_train_bigram, y_train, 'Bigram Counts')
 train_and_show_scores_naive_bayes(X_train_bigram_tf_idf, y_train, 'Bigram Tf-Idf')
 
-clf_mulinomial_naive_bayes = MultinomialNB()
-clf_mulinomial_naive_bayes.fit(X_train_bigram_tf_idf,y_train)
-print(f'Score of Naive Bayes without hyperparameter: {clf_mulinomial_naive_bayes.score(X_test_bigram_tf_idf,y_test)}')
-'''
+#clf_mulinomial_naive_bayes = MultinomialNB()
+#clf_mulinomial_naive_bayes.fit(X_train_bigram_tf_idf,y_train)
+#print(f'Score of Naive Bayes without hyperparameter: {clf_mulinomial_naive_bayes.score(X_test_bigram_tf_idf,y_test)}')
+
+#Hyper Tuning MultinomialNB
+tuned_parameters = {
+    'vect__ngram_range': [(1, 1), (1, 2), (2, 2)],
+    'tfidf__use_idf': (True, False),
+    'tfidf__norm': ('l1', 'l2'),
+    'clf__alpha': [1, 1e-1, 1e-2]
+}
