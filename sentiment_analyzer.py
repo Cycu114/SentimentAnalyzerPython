@@ -4,7 +4,7 @@ from os import system, listdir
 from os.path import isfile, join
 from random import shuffle
 from sklearn.linear_model import SGDClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from scipy.sparse import csr_matrix
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -325,19 +325,36 @@ def train_and_show_scores_naive_bayes(X: csr_matrix, y: np.array, title: str) ->
     valid_score = clf.score(X_valid, y_valid)
     print(f'{title}\nTrain score: {round(train_score, 2)} ; Validation score: {round(valid_score, 2)}\n')
 
-train_and_show_scores_naive_bayes(X_train_unigram, y_train, 'Unigram Counts')
-train_and_show_scores_naive_bayes(X_train_unigram_tf_idf, y_train, 'Unigram Tf-Idf')
-train_and_show_scores_naive_bayes(X_train_bigram, y_train, 'Bigram Counts')
-train_and_show_scores_naive_bayes(X_train_bigram_tf_idf, y_train, 'Bigram Tf-Idf')
+#train_and_show_scores_naive_bayes(X_train_unigram, y_train, 'Unigram Counts')
+#train_and_show_scores_naive_bayes(X_train_unigram_tf_idf, y_train, 'Unigram Tf-Idf')
+#train_and_show_scores_naive_bayes(X_train_bigram, y_train, 'Bigram Counts')
+#train_and_show_scores_naive_bayes(X_train_bigram_tf_idf, y_train, 'Bigram Tf-Idf')
 
 #clf_mulinomial_naive_bayes = MultinomialNB()
 #clf_mulinomial_naive_bayes.fit(X_train_bigram_tf_idf,y_train)
 #print(f'Score of Naive Bayes without hyperparameter: {clf_mulinomial_naive_bayes.score(X_test_bigram_tf_idf,y_test)}')
 
 #Hyper Tuning MultinomialNB
+X_train_multinomialNB = X_train_bigram_tf_idf
+
+alpha = [float(x) for x in np.linspace(0.0000000001, 1.0, num = 5)]
+fit_prior = [True, False]
+
 tuned_parameters = {
-    'vect__ngram_range': [(1, 1), (1, 2), (2, 2)],
-    'tfidf__use_idf': (True, False),
-    'tfidf__norm': ('l1', 'l2'),
-    'clf__alpha': [1, 1e-1, 1e-2]
+    'alpha': alpha,
+    'fit_prior': fit_prior
 }
+'''
+clf_multinomialNB = MultinomialNB()
+clf_multinomialNB = GridSearchCV(clf_multinomialNB, tuned_parameters, cv=10, verbose=1, n_jobs=-1)
+clf_multinomialNB.fit(X_train_multinomialNB,y_train)
+print(clf_multinomialNB.best_params_)
+print(clf_multinomialNB.best_score_)
+
+dump(clf_multinomialNB.best_estimator_, 'classifiers/multinomialNB_classifier.joblib')
+'''
+clf_multinomialNB = load('classifiers/multinomialNB_classifier.joblib')
+
+#Testing the classifier
+
+score = clf_multinomialNB.score(X_test_bigram_tf_idf, y_test)
