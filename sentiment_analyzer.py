@@ -50,7 +50,7 @@ y_test = imdb_test['label'].values
 y_train = imdb_train['label'].values
 '''
 
-
+#AFTER FIRST RUN THIS SECTION CAN BE COMMENTED TILL TESTING THE MODELS FOR BETTER PERFORMANCE
 # CREATING DATAFRAMES
 def create_data_frame(folder: str) -> pd.DataFrame:
     
