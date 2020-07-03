@@ -52,6 +52,9 @@ y_train = imdb_train['label'].values
 
 #AFTER FIRST RUN THIS SECTION CAN BE COMMENTED TILL TESTING THE MODELS FOR BETTER PERFORMANCE
 # CREATING DATAFRAMES
+#If running on linux you can uncomment this two lines for getting the data from imdb datasets otherwise look at README.md file on git
+#system('wget "http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz"')
+#system('tar -xzf "aclImdb_v1.tar.gz"')
 def create_data_frame(folder: str) -> pd.DataFrame:
     
     #folder - the root folder of train or test dataset
